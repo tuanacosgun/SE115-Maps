@@ -6,9 +6,9 @@ public class Main {
 
     // Method to read the file and check for format errors
     public static void readFile(String fileName) {
-        Scanner reader = null;
-        int lineNumber = 1;
-        boolean isValid = true;
+        Scanner reader = null; // Scanner object to read the file
+        int lineNumber = 1; // Variable to track the line number
+        boolean isValid = true; // Flag to determine if the file is valid
 
         // Array to store valid city labels
         String[] validCities = null;
@@ -19,29 +19,29 @@ public class Main {
             // Read the number of cities (First line)
             if (reader.hasNextLine()) {
                 String citiesCount = reader.nextLine().trim();
-                if (!citiesCount.matches("\\d+")) {
+                if (!citiesCount.matches("\\d+")) { // Check if the city count is a valid number
                     System.out.println("Error Line: " + lineNumber + " Invalid number of cities.");
-                    isValid = false;
+                    isValid = false; // Mark the file as invalid if the count is incorrect
                 } else {
-                    validCities = new String[Integer.parseInt(citiesCount)];
+                    validCities = new String[Integer.parseInt(citiesCount)]; // Create an array to store city labels
                 }
             }
-            lineNumber++;
+            lineNumber++; // Move to the next line
 
             // Read city labels (Second line)
             if (reader.hasNextLine()) {
                 String citiesLine = reader.nextLine().trim();
-                String[] cityLabels = citiesLine.split(" ");
+                String[] cityLabels = citiesLine.split(" "); // Split the city labels by spaces
                 if (validCities != null && cityLabels.length != validCities.length) {
                     System.out.println("Error Line: " + lineNumber + " The number of city labels does not match the city count.");
                     isValid = false;
                 } else {
                     for (int i = 0; i < cityLabels.length; i++) {
-                        if (cityLabels[i].length() != 1) {
+                        if (cityLabels[i].length() != 1) { // Check if each label is a single character
                             System.out.println("Error Line: " + lineNumber + " Invalid city label: " + cityLabels[i]);
                             isValid = false;
                         }
-                        validCities[i] = cityLabels[i];
+                        validCities[i] = cityLabels[i]; // Add the label to the array
                     }
                 }
             }
@@ -51,20 +51,20 @@ public class Main {
             int expectedRouteCount = 0;
             if (reader.hasNextLine()) {
                 String routesCountLine = reader.nextLine().trim();
-                if (!routesCountLine.matches("\\d+")) {
+                if (!routesCountLine.matches("\\d+")) { // Check if the route count is a valid number
                     System.out.println("Error Line: " + lineNumber + " Invalid number of routes.");
                     isValid = false;
                 } else {
-                    expectedRouteCount = Integer.parseInt(routesCountLine);
+                    expectedRouteCount = Integer.parseInt(routesCountLine); // Store the expected route count
                 }
             }
             lineNumber++;
 
-            // Read routes (Next lines)
+            // Read the routes (From the fourth line onward)
             for (int i = 0; i < expectedRouteCount; i++) {
                 if (reader.hasNextLine()) {
                     String routeLine = reader.nextLine().trim();
-                    String[] routeParts = routeLine.split(" ");
+                    String[] routeParts = routeLine.split(" "); // Split the route by spaces
                     if (routeParts.length != 3) {
                         System.out.println("Error Line: " + lineNumber + " Incorrect route format. Expected '<City1> <City2> <Time>'.");
                         isValid = false;
@@ -74,8 +74,8 @@ public class Main {
                             isValid = false;
                         }
                         try {
-                            int time = Integer.parseInt(routeParts[2]);
-                            if (time < 0) {
+                            int time = Integer.parseInt(routeParts[2]); // Check if the time is a valid number
+                            if (time < 0) { // Check if the time is negative
                                 System.out.println("Error Line: " + lineNumber + " Invalid time value. Time cannot be negative.");
                                 isValid = false;
                             }
@@ -107,10 +107,10 @@ public class Main {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Print file reading errors
         } finally {
             if (reader != null) {
-                reader.close();
+                reader.close(); // Close the file reading process
             }
         }
 
@@ -122,21 +122,23 @@ public class Main {
 
     // Method to check if a city is valid
     public static boolean isCityValid(String city, String[] validCities) {
-        if (validCities == null) return false;
+        if (validCities == null) return false; // Return false if validCities array is null
         for (String validCity : validCities) {
             if (validCity.equals(city)) {
-                return true;
+                return true; // Return true if the city is valid
             }
         }
-        return false;
+        return false; // Return false if the city is not valid
     }
 
+    // Main method
     public static void main(String[] args) {
-        if (args.length == 0) {
+        if (args.length == 0) { // If no file name is provided from the command line
             System.out.println("Error: No file name provided.");
             return;
+        } else {
+            readFile(args[0]); // Pass the file name to the `readFile` method
         }
-        readFile(args[0]);
     }
 }
 
