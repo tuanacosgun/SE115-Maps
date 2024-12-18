@@ -1,17 +1,21 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Formatter;
 import java.util.Scanner;
 
 public class Main {
 
     // Method to read the file and check for format errors
     public static void readFile(String fileName) {
-        Scanner reader = null; // Scanner object to read the file
-        int lineNumber = 1; // Variable to track the line number
-        boolean isValid = true; // Flag to determine if the file is valid
+        Scanner reader = null;
+        int lineNumber = 1;
+        boolean isValid = true;
 
-        // Array to store valid city labels
         String[] validCities = null;
+        CountryMap[] paths = null;
+        City[] cities = null;
 
         try {
             reader = new Scanner(Paths.get(fileName));
@@ -19,29 +23,31 @@ public class Main {
             // Read the number of cities (First line)
             if (reader.hasNextLine()) {
                 String citiesCount = reader.nextLine().trim();
-                if (!citiesCount.matches("\\d+")) { // Check if the city count is a valid number
+                if (!citiesCount.matches("\\d+")) {
                     System.out.println("Error Line: " + lineNumber + " Invalid number of cities.");
-                    isValid = false; // Mark the file as invalid if the count is incorrect
+                    isValid = false;
                 } else {
-                    validCities = new String[Integer.parseInt(citiesCount)]; // Create an array to store city labels
+                    validCities = new String[Integer.parseInt(citiesCount)];
+                    cities = new City[validCities.length]; // Create a City array based on the number of cities
                 }
             }
-            lineNumber++; // Move to the next line
+            lineNumber++;
 
             // Read city labels (Second line)
             if (reader.hasNextLine()) {
                 String citiesLine = reader.nextLine().trim();
-                String[] cityLabels = citiesLine.split(" "); // Split the city labels by spaces
+                String[] cityLabels = citiesLine.split(" ");
                 if (validCities != null && cityLabels.length != validCities.length) {
                     System.out.println("Error Line: " + lineNumber + " The number of city labels does not match the city count.");
                     isValid = false;
                 } else {
                     for (int i = 0; i < cityLabels.length; i++) {
-                        if (cityLabels[i].length() != 1) { // Check if each label is a single character
+                        if (cityLabels[i].length() != 1) {
                             System.out.println("Error Line: " + lineNumber + " Invalid city label: " + cityLabels[i]);
                             isValid = false;
                         }
-                        validCities[i] = cityLabels[i]; // Add the label to the array
+                        validCities[i] = cityLabels[i];
+                        cities[i] = new City(validCities[i], i); // Create a City object for each city
                     }
                 }
             }
@@ -51,47 +57,36 @@ public class Main {
             int expectedRouteCount = 0;
             if (reader.hasNextLine()) {
                 String routesCountLine = reader.nextLine().trim();
-                if (!routesCountLine.matches("\\d+")) { // Check if the route count is a valid number
+                if (!routesCountLine.matches("\\d+")) {
                     System.out.println("Error Line: " + lineNumber + " Invalid number of routes.");
                     isValid = false;
                 } else {
-                    expectedRouteCount = Integer.parseInt(routesCountLine); // Store the expected route count
+                    expectedRouteCount = Integer.parseInt(routesCountLine);
                 }
             }
             lineNumber++;
 
             // Read the routes (From the fourth line onward)
+            paths = new CountryMap[expectedRouteCount];
             for (int i = 0; i < expectedRouteCount; i++) {
                 if (reader.hasNextLine()) {
                     String routeLine = reader.nextLine().trim();
-                    String[] routeParts = routeLine.split(" "); // Split the route by spaces
+                    String[] routeParts = routeLine.split(" ");
                     if (routeParts.length != 3) {
                         System.out.println("Error Line: " + lineNumber + " Incorrect route format. Expected '<City1> <City2> <Time>'.");
                         isValid = false;
                     } else {
-                        if (!isCityValid(routeParts[0], validCities) || !isCityValid(routeParts[1], validCities)) {
-                            System.out.println("Error Line: " + lineNumber + " Invalid city in route: " + routeLine);
-                            isValid = false;
-                        }
-                        try {
-                            int time = Integer.parseInt(routeParts[2]); // Check if the time is a valid number
-                            if (time < 0) { // Check if the time is negative
-                                System.out.println("Error Line: " + lineNumber + " Invalid time value. Time cannot be negative.");
-                                isValid = false;
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Error Line: " + lineNumber + " Invalid time value. Expected a number.");
-                            isValid = false;
-                        }
+                        City source = getCity(routeParts[0], cities);
+                        City destination = getCity(routeParts[1], cities);
+                        int time = Integer.parseInt(routeParts[2]);
+                        paths[i] = new CountryMap(source, destination, time);
                     }
-                } else {
-                    System.out.println("Error Line: " + lineNumber + " Missing route definition.");
-                    isValid = false;
                 }
                 lineNumber++;
             }
 
             // Read starting and ending city (Last line)
+            City start = null, end = null;
             if (reader.hasNextLine()) {
                 String startEndCities = reader.nextLine().trim();
                 String[] startEnd = startEndCities.split(" ");
@@ -99,47 +94,54 @@ public class Main {
                     System.out.println("Error Line: " + lineNumber + " Incorrect start/end city format.");
                     isValid = false;
                 } else {
-                    if (!isCityValid(startEnd[0], validCities) || !isCityValid(startEnd[1], validCities)) {
-                        System.out.println("Error Line: " + lineNumber + " Invalid start or end city.");
-                        isValid = false;
-                    }
+                    start = getCity(startEnd[0], cities);
+                    end = getCity(startEnd[1], cities);
                 }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace(); // Print file reading errors
+            if (isValid) {
+                System.out.println("File read is successful!"); // Print success message
+                WayFinder wayFinder = new WayFinder(paths);
+                String result = wayFinder.findShortestPath(start, end, cities);
+
+                System.out.println(result);  // Print the fastest way and total time
+
+                //Write output to a file
+                try (FileWriter writer = new FileWriter("output.txt")) {
+                    writer.write(result); //Write formatted to the file
+                }catch (IOException e){
+                    System.out.println("File write is unsuccessfull!");
+                }
+            }
+
+        } catch (Exception e) {
+           // e.printStackTrace();
         } finally {
             if (reader != null) {
-                reader.close(); // Close the file reading process
+                reader.close();
             }
-        }
-
-        // If no errors found, print success message
-        if (isValid) {
-            System.out.println("File read is successful!");
         }
     }
 
-    // Method to check if a city is valid
-    public static boolean isCityValid(String city, String[] validCities) {
-        if (validCities == null) return false; // Return false if validCities array is null
-        for (String validCity : validCities) {
-            if (validCity.equals(city)) {
-                return true; // Return true if the city is valid
+    // Helper method to get City object based on city name
+    public static City getCity(String cityName, City[] cities) {
+        for (City city : cities) {
+            if (city.getName().equals(cityName)) {
+                return city;
             }
         }
-        return false; // Return false if the city is not valid
+        return null; // Return null if city not found
     }
 
     // Main method
     public static void main(String[] args) {
-        if (args.length == 0) { // If no file name is provided from the command line
-            System.out.println("Error: No file name provided.");
+        if (args.length == 0) {
+            System.out.println("Error: No file name provided. Enter the text files name from the command line!");
             return;
         } else {
-            readFile(args[0]); // Pass the file name to the `readFile` method
+            readFile(args[0]);
+            FileWriter writer = null; //Create filewriter
+
         }
     }
 }
-
-
