@@ -1,14 +1,12 @@
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Formatter;
 import java.util.Scanner;
 
 public class Main {
 
     // Method to read the file and check for format errors
-    public static void readFile(String fileName) {
+    public static void readFile(String inputFileName, String outputFileName) {
         Scanner reader = null;
         int lineNumber = 1;
         boolean isValid = true;
@@ -18,7 +16,7 @@ public class Main {
         City[] cities = null;
 
         try {
-            reader = new Scanner(Paths.get(fileName));
+            reader = new Scanner(Paths.get(inputFileName));
 
             // Read the number of cities (First line)
             if (reader.hasNextLine()) {
@@ -73,7 +71,7 @@ public class Main {
                     String routeLine = reader.nextLine().trim();
                     String[] routeParts = routeLine.split(" ");
                     if (routeParts.length != 3) {
-                        System.out.println("Error Line: " + lineNumber + " Incorrect route format. Expected '<City1> <City2> <Time>'.");
+                        System.out.println("Error Line: " + lineNumber + " Incorrect route format. Expected '<City1> <City2> <Time>'");
                         isValid = false;
                     } else {
                         City source = getCity(routeParts[0], cities);
@@ -100,22 +98,24 @@ public class Main {
             }
 
             if (isValid) {
-                System.out.println("File read is successful!"); // Print success message
+                System.out.println("File read is successful!");
                 WayFinder wayFinder = new WayFinder(paths);
                 String result = wayFinder.findShortestPath(start, end, cities);
 
-                System.out.println(result);  // Print the fastest way and total time
+                // Print result to console
+                System.out.println(result);
 
-                //Write output to a file
-                try (FileWriter writer = new FileWriter("output.txt")) {
-                    writer.write(result); //Write formatted to the file
-                }catch (IOException e){
-                    System.out.println("File write is unsuccessfull!");
+                // Write output to a file
+                try (FileWriter writer = new FileWriter(outputFileName)) {
+                    writer.write(result);
+                    System.out.println("Results written to: " + outputFileName);
+                } catch (IOException e) {
+                    System.out.println("File write was unsuccessful!");
                 }
             }
 
         } catch (Exception e) {
-           // e.printStackTrace();
+            System.out.println("An error occurred while reading the file.");
         } finally {
             if (reader != null) {
                 reader.close();
@@ -135,13 +135,11 @@ public class Main {
 
     // Main method
     public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Error: No file name provided. Enter the text files name from the command line!");
+        if (args.length < 2) {
+            System.out.println("Error: Please provide input and output file names as command line arguments.");
             return;
         } else {
-            readFile(args[0]);
-            FileWriter writer = null; //Create filewriter
-
+            readFile(args[0], args[1]);
         }
     }
 }
