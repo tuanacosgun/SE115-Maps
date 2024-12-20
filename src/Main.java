@@ -26,7 +26,7 @@ public class Main {
                     isValid = false;
                 } else {
                     validCities = new String[Integer.parseInt(citiesCount)];
-                    cities = new City[validCities.length]; // Create a City array based on the number of cities
+                    cities = new City[validCities.length];
                 }
             }
             lineNumber++;
@@ -45,7 +45,7 @@ public class Main {
                             isValid = false;
                         }
                         validCities[i] = cityLabels[i];
-                        cities[i] = new City(validCities[i], i); // Create a City object for each city
+                        cities[i] = new City(validCities[i], i);
                     }
                 }
             }
@@ -64,7 +64,7 @@ public class Main {
             }
             lineNumber++;
 
-            // Read the routes (From the fourth line onward)
+            // Read the routes
             paths = new CountryMap[expectedRouteCount];
             for (int i = 0; i < expectedRouteCount; i++) {
                 if (reader.hasNextLine()) {
@@ -76,14 +76,21 @@ public class Main {
                     } else {
                         City source = getCity(routeParts[0], cities);
                         City destination = getCity(routeParts[1], cities);
-                        int time = Integer.parseInt(routeParts[2]);
+                        int time;
+                        try {
+                            time = Integer.parseInt(routeParts[2]);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error Line: " + lineNumber + " Invalid time value.");
+                            isValid = false;
+                            continue;
+                        }
                         paths[i] = new CountryMap(source, destination, time);
                     }
                 }
                 lineNumber++;
             }
 
-            // Read starting and ending city (Last line)
+            // Read starting and ending city
             City start = null, end = null;
             if (reader.hasNextLine()) {
                 String startEndCities = reader.nextLine().trim();
@@ -108,14 +115,16 @@ public class Main {
                 // Write output to a file
                 try (FileWriter writer = new FileWriter(outputFileName)) {
                     writer.write(result);
-                    System.out.println("Results written to: " + outputFileName);
+                    System.out.println("Results successfully written to: " + outputFileName);
                 } catch (IOException e) {
-                    System.out.println("File write was unsuccessful!");
+                    System.out.println("Error: Could not write to the output file. Please check permissions or disk space.");
                 }
             }
 
+        } catch (IOException e) {
+            System.out.println("Error: Could not read the input file. Please ensure the file exists and is accessible.");
         } catch (Exception e) {
-            System.out.println("An error occurred while reading the file.");
+            System.out.println("Error: An unexpected error occurred while processing the file.");
         } finally {
             if (reader != null) {
                 reader.close();
@@ -130,7 +139,7 @@ public class Main {
                 return city;
             }
         }
-        return null; // Return null if city not found
+        return null;
     }
 
     // Main method
