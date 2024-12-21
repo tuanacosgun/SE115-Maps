@@ -2,6 +2,6 @@
 X Y Z
 3
 X Y 6
-X Z 10
+X I 10
 Y Z 2
-X Z
+X

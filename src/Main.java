@@ -5,6 +5,14 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static boolean contains(String[] a, String city){
+        for(int i=0;i<a.length;i++){
+            if(a[i].equals(city)){
+                return true;
+            }
+        }
+        return false;
+    }
     //Method to read the file and check for format errors
     public static void readFile(String inputFileName, String outputFileName) {
         Scanner reader = null;
@@ -77,6 +85,11 @@ public class Main {
                     } else {
                         City source = getCity(routeParts[0], cities);  //Get the source city object
                         City destination = getCity(routeParts[1], cities);  //Get the destination city object
+                        if(!contains(validCities,routeParts[0]) || !contains(validCities,routeParts[1])){
+                            System.out.println("Error Line: " + lineNumber + " Invalid city selected.");
+                            isValid = false;  //Mark as invalid if the time is not a valid integer
+                            continue;
+                        }
                         int time;
                         try {
                             time = Integer.parseInt(routeParts[2]);  //Parse the travel time
@@ -96,9 +109,10 @@ public class Main {
             if (reader.hasNextLine()) {
                 String startEndCities = reader.nextLine().trim();  //Get the start and end cities
                 String[] startEnd = startEndCities.split(" ");  //Split the cities
-                if (startEnd.length != 2) {  // Validate the format
+                if (startEnd.length != 2 ) {  // Validate the format
                     System.out.println("Error Line: " + lineNumber + " Incorrect start/end city format.");
                     isValid = false;
+                    return;
                 } else {
                     start = getCity(startEnd[0], cities);  //Get the start city object
                     end = getCity(startEnd[1], cities);  //Get the end city object
