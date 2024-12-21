@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SE115 Maps(20230601018):jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SE115_Maps_20230601018__jar</output-path>
+    <root id="archive" name="SE115 Maps.jar">
+      <element id="module-output" name="SE115 Maps" />
+    </root>
+  </artifact>
+</component>

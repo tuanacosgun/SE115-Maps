@@ -1,2 +1,2 @@
-Fastest Way: X -> Y -> Z
-Total Time: 8 min
+Fastest Way: A -> C -> E
+Total Time: 50 min

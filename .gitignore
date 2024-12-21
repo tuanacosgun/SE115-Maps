@@ -30,3 +30,4 @@ bin/
 *.class
 *.class
 src/City.class
+src/output.txt

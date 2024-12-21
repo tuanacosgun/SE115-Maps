@@ -35,6 +35,9 @@ public class WayFinder {
         for (int i = 0; i < numCities; i++) {
             distances[i] = Integer.MAX_VALUE;
         }
+        if(source == null || destination == null){
+            System.out.println("Error: Start/end city does not exist.");
+        }
         distances[source.getOrder()] = 0;  //Set the distance to the source city as 0
 
         //Implement Dijkstra's algorithm

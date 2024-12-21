@@ -1,2 +1,0 @@
-Fastest Way: A -> C -> E
-Total Time: 50 min

@@ -121,9 +121,11 @@ public class Main {
                 }
             }
 
+
+
         } catch (IOException e) {
             System.out.println("Error: Could not read the input file. Please ensure the file exists and is accessible.");
-        } catch (Exception e) {
+        }catch (Exception e) {
             System.out.println("Error: An unexpected error occurred while processing the file.");
         } finally {
             if (reader != null) {
