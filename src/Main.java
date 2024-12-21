@@ -107,9 +107,10 @@ public class Main {
 
             //If the file format is valid proceed to find the shortest path
             if (isValid) {
-                System.out.println("File read is successful!");  //Confirm that the file was read successfully
                 WayFinder wayFinder = new WayFinder(paths);  //Create a WayFinder object with the paths
                 String result = wayFinder.findShortestPath(start, end, cities);  //Find the shortest path
+                System.out.println("File read is successful!");  //Confirm that the file was read successfully
+
                 System.out.println(result);
 
                 // Write output to a file
